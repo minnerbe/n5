@@ -352,6 +352,32 @@ public abstract class AbstractN5Test {
 	}
 
 	@Test
+	public void testWriteReadRawBlock() {
+
+		for (final Compression compression : getCompressions()) {
+			final DataType dataType = DataType.RAW;
+
+			System.out.println("Testing " + compression.getType() + " " + dataType);
+			try {
+				n5.createDataset(datasetName, dimensions, blockSize, dataType, compression);
+				final DatasetAttributes attributes = n5.getDatasetAttributes(datasetName);
+				final ByteArrayDataBlock dataBlock = new ByteArrayDataBlock(blockSize, new long[]{0, 0, 0}, byteBlock);
+				n5.writeBlock(datasetName, attributes, dataBlock);
+
+				final DataBlock<?> loadedDataBlock = n5.readBlock(datasetName, attributes, new long[]{0, 0, 0});
+
+				Assert.assertArrayEquals(byteBlock, (byte[])loadedDataBlock.getData());
+
+				Assert.assertTrue(n5.remove(datasetName));
+
+			} catch (final IOException e) {
+				e.printStackTrace();
+				fail("Block cannot be written.");
+			}
+		}
+	}
+
+	@Test
 	public void testWriteReadSerializableBlock() throws ClassNotFoundException {
 
 		for (final Compression compression : getCompressions()) {
