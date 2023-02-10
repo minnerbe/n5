@@ -359,7 +359,7 @@ public abstract class AbstractN5Test {
 
 			System.out.println("Testing " + compression.getType() + " " + dataType);
 			try {
-				n5.createRawDataset(datasetName, dimensions, blockSize, "raw", compression);
+				n5.createRawDataset(datasetName, dimensions, blockSize, "custom", compression);
 				final DatasetAttributes attributes = n5.getDatasetAttributes(datasetName);
 				final ByteArrayDataBlock dataBlock = new ByteArrayDataBlock(blockSize, new long[]{0, 0, 0}, byteBlock);
 				n5.writeBlock(datasetName, attributes, dataBlock);

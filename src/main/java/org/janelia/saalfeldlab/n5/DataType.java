@@ -76,7 +76,7 @@ public enum DataType {
 		for (final DataType value : values())
 			if (value.toString().equals(string))
 				return value;
-		return null;
+		return RAW;
 	}
 
 	/**
