@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -150,6 +151,21 @@ public interface N5Writer extends N5Reader {
 			final Compression compression) throws IOException {
 
 		createDataset(pathName, new DatasetAttributes(dimensions, blockSize, dataType, compression));
+	}
+
+	public default void createRawDataset(
+			final String pathName,
+			final long[] dimensions,
+			final int[] blockSize,
+			final String dataTypeName,
+			final Compression compression) throws IOException {
+
+		createGroup(pathName);
+		DatasetAttributes attributes = new DatasetAttributes(dimensions, blockSize, DataType.RAW, compression);
+		// TODO: make this more robust ("dataType" is hardcoded right now)
+		HashMap<String, Object> attributesMap = attributes.asMap();
+		attributesMap.replace("dataType", dataTypeName);
+		setAttributes(pathName, attributesMap);
 	}
 
 	/**
