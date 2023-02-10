@@ -153,6 +153,16 @@ public interface N5Writer extends N5Reader {
 		createDataset(pathName, new DatasetAttributes(dimensions, blockSize, dataType, compression));
 	}
 
+	/**
+	 * Creates a dataset with a custom data type attribute.
+	 *
+	 * @param pathName dataset path
+	 * @param dimensions
+	 * @param blockSize
+	 * @param dataTypeName name of custom data type
+	 * @param compression
+	 * @throws IOException
+	 */
 	public default void createRawDataset(
 			final String pathName,
 			final long[] dimensions,
