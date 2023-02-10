@@ -18,16 +18,26 @@ package org.janelia.saalfeldlab.n5;
 
 
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.stream.Stream;
 
+/**
+ * Encodes arrays of variable length strings that are null-terminated when written on disk.
+ */
 public class VlStringArraySerializer {
     private final String[] data;
+    private final Charset encoding;
+    private static final String NULLCHAR = "\0";
     public static String dataTypeTag = "String(-1)";
 
     VlStringArraySerializer(String[] data) {
+       this(data, StandardCharsets.UTF_8);
+    }
+
+    VlStringArraySerializer(String[] data, Charset encoding) {
         this.data = data;
+        this.encoding = encoding;
     }
 
     public String[] getData() {
@@ -35,22 +45,21 @@ public class VlStringArraySerializer {
     }
 
     public byte[] toByteArray() {
-        final byte[] nullChar = "\0".getBytes(StandardCharsets.UTF_8);
-        final int charSize = nullChar.length;
+        final byte[] nullCharSequence = NULLCHAR.getBytes(encoding);
+        final int charSize = nullCharSequence.length;
 
         final int numTotalChars = Arrays.stream(data).map(String::length).reduce(0, Integer::sum);
         final int numNullChars = data.length;
 
         final ByteBuffer buffer = ByteBuffer.allocate((numTotalChars + numNullChars) * charSize);
         for (String str : data)
-            buffer.put(str.getBytes(StandardCharsets.UTF_8)).put(nullChar);
+            buffer.put(str.getBytes(encoding)).put(nullCharSequence);
         return buffer.array();
     }
 
     public static VlStringArraySerializer fromByteArray(byte[] byteArray) {
         final String rawChars = new String(byteArray);
-        final byte[] nullChar = "\0".getBytes(StandardCharsets.UTF_8);
-        final String[] data = rawChars.split("\0");
+        final String[] data = rawChars.split(NULLCHAR);
         return new VlStringArraySerializer(data);
     }
 }
