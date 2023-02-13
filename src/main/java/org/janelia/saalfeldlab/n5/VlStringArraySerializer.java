@@ -21,30 +21,27 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import org.janelia.saalfeldlab.n5.StandardizedTypeSerializer.StandardizedType;
 
 /**
- * Encodes arrays of variable length strings that are null-terminated when written on disk.
- */
-public class VlStringArraySerializer {
-    private final String[] data;
-    private final Charset encoding;
+ * Encodes arrays of variable length strings that are null-terminated when written on disk. */
+@StandardizedType("String(-1)")
+public class VlStringArraySerializer implements StandardizedTypeSerializer<String[]>{
     private static final String NULLCHAR = "\0";
-    public static String dataTypeTag = "String(-1)";
 
-    VlStringArraySerializer(String[] data) {
-       this(data, StandardCharsets.UTF_8);
+    @ConversionParameter
+    private final Charset encoding;
+
+    VlStringArraySerializer() {
+       this(StandardCharsets.UTF_8);
     }
 
-    VlStringArraySerializer(String[] data, Charset encoding) {
-        this.data = data;
+    VlStringArraySerializer(Charset encoding) {
         this.encoding = encoding;
     }
 
-    public String[] getData() {
-        return data;
-    }
-
-    public byte[] toByteArray() {
+    @Override
+    public byte[] toByteArray(String[] data) {
         final byte[] nullCharSequence = NULLCHAR.getBytes(encoding);
         final int charSize = nullCharSequence.length;
 
@@ -57,9 +54,10 @@ public class VlStringArraySerializer {
         return buffer.array();
     }
 
-    public static VlStringArraySerializer fromByteArray(byte[] byteArray) {
-        final String rawChars = new String(byteArray);
+    @Override
+    public String[] fromByteArray(byte[] rawData) {
+        final String rawChars = new String(rawData);
         final String[] data = rawChars.split(NULLCHAR);
-        return new VlStringArraySerializer(data);
+        return data;
     }
 }
