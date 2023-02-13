@@ -154,31 +154,6 @@ public interface N5Writer extends N5Reader {
 	}
 
 	/**
-	 * Creates a dataset with a custom data type attribute.
-	 *
-	 * @param pathName dataset path
-	 * @param dimensions
-	 * @param blockSize
-	 * @param dataTypeName name of custom data type
-	 * @param compression
-	 * @throws IOException
-	 */
-	public default void createRawDataset(
-			final String pathName,
-			final long[] dimensions,
-			final int[] blockSize,
-			final String dataTypeName,
-			final Compression compression) throws IOException {
-
-		createGroup(pathName);
-		DatasetAttributes attributes = new DatasetAttributes(dimensions, blockSize, DataType.RAW, compression);
-		// TODO: make this more robust ("dataType" is hardcoded right now)
-		HashMap<String, Object> attributesMap = attributes.asMap();
-		attributesMap.replace("dataType", dataTypeName);
-		setAttributes(pathName, attributesMap);
-	}
-
-	/**
 	 * Writes a {@link DataBlock}.
 	 *
 	 * @param pathName dataset path

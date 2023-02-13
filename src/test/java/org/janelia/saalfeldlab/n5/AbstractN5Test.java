@@ -381,19 +381,22 @@ public abstract class AbstractN5Test {
 	public void testWriteReadCustomBlockAsRaw() {
 
 		String[] data = new String[]{"", "a", "ab", "ABC"};
-	VlStringArraySerializer converter = new VlStringArraySerializer();
+		VlStringArraySerializer converter = new VlStringArraySerializer();
 		for (final Compression compression : getCompressions()) {
 
 			final String dataTypeName = converter.getType();
 			System.out.println("Testing " + compression.getType() + " " + dataTypeName);
 			try {
-				n5.createRawDataset(datasetName, dimensions, blockSize, dataTypeName, compression);
+				n5.createDataset(datasetName, dimensions, blockSize, DataType.RAW, compression);
+				n5.setAttribute(datasetName, "dataType", dataTypeName);
 				final DatasetAttributes attributes = n5.getDatasetAttributes(datasetName);
 				final ByteArrayDataBlock dataBlock = new ByteArrayDataBlock(blockSize, new long[]{0, 0, 0}, converter.toByteArray(data));
 				n5.writeBlock(datasetName, attributes, dataBlock);
 
-				String[] readData = converter
-						.fromByteArray((byte[]) n5.readBlock(datasetName, attributes, new long[]{0, 0, 0}).getData());
+				String readDataType = n5.getAttribute(datasetName, "dataType", String.class);
+				Assert.assertEquals(readDataType, "String(-1)");
+
+				String[] readData = converter.fromByteArray((byte[]) n5.readBlock(datasetName, attributes, new long[]{0, 0, 0}).getData());
 
 				Assert.assertArrayEquals(data, readData);
 
