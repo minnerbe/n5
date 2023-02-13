@@ -56,7 +56,7 @@ public class VlStringArraySerializer implements StandardizedTypeSerializer<Strin
 
     @Override
     public String[] fromByteArray(byte[] rawData) {
-        final String rawChars = new String(rawData);
+        final String rawChars = new String(rawData, encoding);
         final String[] data = rawChars.split(NULLCHAR);
         return data;
     }
